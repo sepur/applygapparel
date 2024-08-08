@@ -60,7 +60,6 @@ class LygSewingOutputController extends Controller
             ->where('StyleCode', $styleCode)
             ->select('OperatorName', 'SizeName', 'QtyOutput', 'DestinationCode')
             ->get();
-    
             $groupedDetails = $details->groupBy('OperatorName')->map(function ($operatorGroup) use ($sizes) {
             return $operatorGroup->groupBy('DestinationCode')->map(function ($destinationGroup) use ($sizes) {
                 return $sizes->mapWithKeys(function ($sizeName) use ($destinationGroup) {
