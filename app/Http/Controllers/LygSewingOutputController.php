@@ -22,14 +22,7 @@ class LygSewingOutputController extends Controller
             'TrnDate',
             'StyleCode',
             DB::raw('SUM(QtyOutput) as TotalOutput'),
-            DB::raw('(
-                SELECT COUNT(DISTINCT SizeName)
-                FROM lygSewingOutput as sub
-                WHERE sub.TrnDate = lygSewingOutput.TrnDate
-                AND sub.StyleCode = lygSewingOutput.StyleCode
-                AND sub.QtyOutput > 0
-            ) as TotalSize')
-            // DB::raw('COUNT(DISTINCT SizeName) as TotalSize')
+            DB::raw('COUNT(DISTINCT SizeName) as TotalSize')
         )
         ->groupBy('TrnDate', 'StyleCode')
         ->orderBy('TrnDate')
