@@ -15,6 +15,33 @@ class LygSewingOutputController extends Controller
         return view('sewing.index');
       }
     
+    // public function read()
+    // {
+    //     $summary = DB::table('lygSewingOutput')
+    //     ->select(
+    //         'TrnDate',
+    //         'StyleCode',
+    //         DB::raw('SUM(QtyOutput) as TotalOutput'),
+    //         DB::raw('COUNT(DISTINCT SizeName) as TotalSize')
+    //     )
+    //     ->groupBy('TrnDate', 'StyleCode')
+    //     ->orderBy('TrnDate')
+    //     ->orderBy('StyleCode')
+    //     ->get();
+
+    //     $finalSummary = $summary->groupBy(function($item) {
+    //         return $item->TrnDate . '-' . $item->StyleCode;
+    //     })->map(function($items) {
+    //         $firstItem = $items->first();
+    //         return [
+    //             'Date' => $firstItem->TrnDate,
+    //             'StyleCode' => $firstItem->StyleCode,
+    //             'TotalSize' => $items->sum('TotalSize'),
+    //             'TotalOutput' => $items->sum('TotalOutput')
+    //         ];
+    //     })->values(); 
+    //   return view('sewing.read', compact('finalSummary'));
+    // }
     public function read()
     {
         $summary = DB::table('lygSewingOutput')
@@ -22,7 +49,14 @@ class LygSewingOutputController extends Controller
             'TrnDate',
             'StyleCode',
             DB::raw('SUM(QtyOutput) as TotalOutput'),
-            DB::raw('COUNT(DISTINCT SizeName) as TotalSize')
+            DB::raw('(
+                SELECT COUNT(DISTINCT SizeName)
+                FROM lygSewingOutput as sub
+                WHERE sub.TrnDate = lygSewingOutput.TrnDate
+                AND sub.StyleCode = lygSewingOutput.StyleCode
+                AND sub.QtyOutput > 0
+            ) as TotalSize')
+            // DB::raw('COUNT(DISTINCT SizeName) as TotalSize')
         )
         ->groupBy('TrnDate', 'StyleCode')
         ->orderBy('TrnDate')
