@@ -65,60 +65,63 @@ class LygSewingOutputController extends Controller
         });
         return view('sewing.details', compact('groupedDetails', 'sizes'));
     }
-    public function update(Request $request)
-    {
+    // public function update(Request $request)
+    // {
 
-        // $size = $request->input('size');
-        // $destination = $request->input('destination');
-        // $operator = $request->input('operator');
-        // $value = $request->input('value');
+    //     $size = $request->input('size');
+    //     $destination = $request->input('destination');
+    //     $operator = $request->input('operator');
+    //     $value = $request->input('value');
         
-        // DB::table('lygSewingOutput')
-        // ->where('SizeName', $size)
-        // ->where('DestinationCode', $destination)
-        // ->where('OperatorName', $operator)
-        // ->update(['QtyOutput' => $value]);
-        // return response()->json(['status' => 'success']);
+    //     DB::table('lygSewingOutput')
+    //     ->where('SizeName', $size)
+    //     ->where('DestinationCode', $destination)
+    //     ->where('OperatorName', $operator)
+    //     ->update(['QtyOutput' => $value]);
+    //     return response()->json(['status' => 'success']);
+    // }
+public function update(Request $request)
+{
+    $size = $request->input('size');
+    $destination = $request->input('destination');
+    $operator = $request->input('operator');
+    $value = $request->input('value');
 
-        $size = $request->input('size');
-        $destination = $request->input('destination');
-        $operator = $request->input('operator');
-        $value = $request->input('value');
-    
-        // Update data
-        DB::table('lygSewingOutput')
-            ->where('SizeName', $size)
-            ->where('DestinationCode', $destination)
-            ->where('OperatorName', $operator)
-            ->update(['QtyOutput' => $value]);
-    
-        // Calculate updated totals
-        $summary = DB::table('lygSewingOutput')
-            ->select(
-                'TrnDate',
-                'StyleCode',
-                DB::raw('SUM(QtyOutput) as TotalOutput'),
-                DB::raw('COUNT(DISTINCT SizeName) as TotalSize')
-            )
-            ->groupBy('TrnDate', 'StyleCode')
-            ->orderBy('TrnDate')
-            ->orderBy('StyleCode')
-            ->get();
-    
-        $finalSummary = $summary->groupBy(function($item) {
-            return $item->TrnDate . '-' . $item->StyleCode;
-        })->map(function($items) {
-            $firstItem = $items->first();
-            return [
-                'Date' => $firstItem->TrnDate,
-                'StyleCode' => $firstItem->StyleCode,
-                'TotalSize' => $items->sum('TotalSize'),
-                'TotalOutput' => $items->sum('TotalOutput')
-            ];
-        })->values();
-    
-        return response()->json(['finalSummary' => $finalSummary]);
-    }
+    // Update data
+    DB::table('lygSewingOutput')
+        ->where('SizeName', $size)
+        ->where('DestinationCode', $destination)
+        ->where('OperatorName', $operator)
+        ->update(['QtyOutput' => $value]);
+
+    // Calculate updated totals
+    $summary = DB::table('lygSewingOutput')
+        ->select(
+            'TrnDate',
+            'StyleCode',
+            DB::raw('SUM(QtyOutput) as TotalOutput'),
+            DB::raw('COUNT(DISTINCT SizeName) as TotalSize')
+        )
+        ->groupBy('TrnDate', 'StyleCode')
+        ->orderBy('TrnDate')
+        ->orderBy('StyleCode')
+        ->get();
+
+    $finalSummary = $summary->groupBy(function($item) {
+        return $item->TrnDate . '-' . $item->StyleCode;
+    })->map(function($items) {
+        $firstItem = $items->first();
+        return [
+            'Date' => $firstItem->TrnDate,
+            'StyleCode' => $firstItem->StyleCode,
+            'TotalSize' => $items->sum('TotalSize'),
+            'TotalOutput' => $items->sum('TotalOutput')
+        ];
+    })->values();
+
+    // Return updated summary as JSON
+    return response()->json(['finalSummary' => $finalSummary]);
+}
 
     public function updateSummary()
     {

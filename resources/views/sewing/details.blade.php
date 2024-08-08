@@ -55,6 +55,7 @@ $(document).ready(function() {
                 updateTotalQty($this.closest('tr'));
                 $('#total-size-summary').text(response.totalSize);
                 $('#total-output-summary').text(response.totalOutput);
+                read();
             },
             error: function(xhr) {
                 console.error('Failed to update data');
